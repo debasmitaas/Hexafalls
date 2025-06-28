@@ -589,10 +589,28 @@ class _ProductUploadPageState extends State<ProductUploadPage> {
                       onPressed: _isLoading
                           ? null
                           : () {
+                              // Validate required fields before preview
+                              if (_selectedImage == null) {
+                                _showSnackBar('Please select an image first');
+                                return;
+                              }
+                              if (_productNameController.text.isEmpty) {
+                                _showSnackBar('Please enter a product name');
+                                return;
+                              }
+                              if (_priceController.text.isEmpty) {
+                                _showSnackBar('Please enter a price');
+                                return;
+                              }
+                              
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => const PreviewPage()),
+                                    builder: (context) => PreviewPage(
+                                      imagePath: _selectedImage!.path,
+                                      productName: _productNameController.text,
+                                      price: _priceController.text,
+                                    )),
                               );
                             },
                       icon: const Icon(Icons.remove_red_eye),

@@ -10,13 +10,12 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:frontend/main.dart';
 
 void main() {
-  testWidgets('App starts with marketplace page', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const CraftsmenMarketplaceApp());
+testWidgets('App starts with Intro page', (WidgetTester tester) async {
+  await tester.pumpWidget(const MyApp()); // or CraftsmenMarketplaceApp if renamed
 
-    // Verify that our app shows the marketplace title
-    expect(find.text('Craftsmen Marketplace'), findsOneWidget);
-    expect(find.text('Product Image'), findsOneWidget);
-    expect(find.text('Select Image'), findsOneWidget);
-  });
+  // Check for Intro title and Start Selling button
+  expect(find.text('Intro'), findsOneWidget);
+  expect(find.text('Start Selling'), findsOneWidget);
+});
+
 }

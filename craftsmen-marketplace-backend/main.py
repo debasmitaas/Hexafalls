@@ -5,7 +5,7 @@ import os
 
 from app.core.config import settings
 from app.core.database import engine, Base
-from app.api import products, orders, speech, automation, native_products, native_speech, ai
+from app.api import products, orders, speech, automation, native_products, native_speech, ai, native_products_compat
 
 # Create database tables
 Base.metadata.create_all(bind=engine)
@@ -34,6 +34,7 @@ app.include_router(automation.router, prefix="/api")
 app.include_router(native_products.router, prefix="/api")
 app.include_router(native_speech.router, prefix="/api")
 app.include_router(ai.router, prefix="/ai", tags=["AI"])
+app.include_router(native_products_compat.router)  # Direct path for frontend compatibility
 
 # Create uploads directory
 os.makedirs(settings.upload_folder, exist_ok=True)

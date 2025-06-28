@@ -35,17 +35,30 @@ class AIService:
         """
         if not self.model:
             # Fallback caption if AI is not configured
+            print("🚨 USING FALLBACK: Gemini model not configured!")
+            price_text = f"{price} rupees" if price else "best price"
             return GenerateCaptionResponse(
-                caption=f"Check out this amazing {product_name}! Handcrafted with love and attention to detail. ${price if price else 'Contact for pricing'}",
-                hashtags=["#handmade", "#craftsmanship", "#artisan", "#unique", "#quality"]
+                caption=f"Take this beautiful {product_name} ✨ only for {price_text}! DM for more info 📩",
+                hashtags=["#handmade", "#craftsmanship", "#beautiful", "#affordable", "#quality"]
             )
         
         try:
             # Create a prompt for caption generation
             prompt = self._create_caption_prompt(product_name, product_description, price, category)
+            print(f"🤖 Using Gemini AI for: {product_name} - {price} rupees")
             
-            # Generate content using Gemini
-            response = self.model.generate_content(prompt)
+            # Generate content using Gemini with higher creativity
+            response = self.model.generate_content(
+                prompt,
+                generation_config=genai.types.GenerationConfig(
+                    temperature=0.9,  # Higher temperature for more creativity
+                    top_p=0.95,
+                    top_k=40,
+                    max_output_tokens=200,
+                )
+            )
+            
+            print(f"✅ Gemini Response: {response.text[:100]}...")
             
             # Parse the response
             caption_text = response.text.strip()
@@ -62,17 +75,39 @@ class AIService:
             )
             
         except Exception as e:
-            print(f"Error generating caption: {str(e)}")
+            print(f"❌ Error generating caption: {str(e)}")
+            print(f"🔄 Using fallback for: {product_name}")
             # Return fallback caption
+            price_text = f"{price} rupees" if price else "best price"
             return GenerateCaptionResponse(
-                caption=f"Beautiful {product_name} - handcrafted with passion! ${price if price else 'Contact for pricing'}",
-                hashtags=["#handmade", "#craftsmanship", "#artisan"]
+                caption=f"Grab this stunning {product_name} ✨ only for {price_text}! Perfect for you 💎 DM for more info 📩",
+                hashtags=["#handmade", "#craftsmanship", "#beautiful", "#affordable", "#quality"]
             )
     
     def _create_caption_prompt(self, name: str, description: str, price: float, category: str) -> str:
         """Create a prompt for caption generation"""
+        
+        # Add variety to opening phrases
+        opening_phrases = [
+            "Take this beautiful", "Grab this stunning", "Get this amazing", 
+            "Don't miss this gorgeous", "Check out this incredible", "Love this beautiful",
+            "Want this stunning", "Need this perfect", "Discover this elegant"
+        ]
+        
+        # Add variety to ending phrases  
+        ending_phrases = [
+            "DM for more info 📩", "Message us for details 💬", "Contact us now 📞",
+            "DM us today 💌", "Send us a message 📱", "WhatsApp us 💬"
+        ]
+        
+        # Add variety to descriptive words
+        descriptive_words = [
+            "perfect", "amazing", "gorgeous", "elegant", "stunning", "beautiful", 
+            "incredible", "fantastic", "wonderful", "lovely", "exquisite"
+        ]
+        
         prompt = f"""
-        Create an engaging social media caption for a handcrafted product with the following details:
+        Create a UNIQUE and catchy social media caption for a handcrafted product:
         
         Product Name: {name}
         """
@@ -81,21 +116,32 @@ class AIService:
             prompt += f"Description: {description}\n"
         
         if price:
-            prompt += f"Price: ${price}\n"
+            prompt += f"Price: {price} rupees\n"
             
         if category:
             prompt += f"Category: {category}\n"
         
-        prompt += """
+        prompt += f"""
         Requirements:
-        1. Write a captivating caption that highlights the craftsmanship and uniqueness
-        2. Include relevant hashtags at the end
-        3. Keep it engaging and authentic
-        4. Emphasize the handmade quality
-        5. Include a call-to-action
-        6. Maximum 280 characters
+        1. Use DIFFERENT opening phrases like: {', '.join(opening_phrases[:3])}... (be creative!)
+        2. Include the price: "only for {price} rupees" or "just {price} rupees"
+        3. Use DIFFERENT ending phrases like: {', '.join(ending_phrases[:3])}... (vary it!)
+        4. Add emojis: ✨🛍️💎🌟💖🎉🔥💯⭐
+        5. Use descriptive words: {', '.join(descriptive_words[:4])}...
+        6. Add urgency words: "limited", "hurry", "don't miss", "grab now"
+        7. Include trending hashtags
+        8. Maximum 250 characters
+        9. BE CREATIVE AND DIFFERENT each time!
+        10. Vary the sentence structure completely
         
-        Format the response as a single caption with hashtags included.
+        IMPORTANT: Generate a COMPLETELY DIFFERENT caption style each time. Don't repeat patterns!
+        
+        Example variations:
+        - "🔥 Limited stock! This {name} is flying off our shelves! Only {price} rupees - grab yours before it's gone! 💯 WhatsApp us now!"
+        - "💖 Fall in love with this {name}! Perfect for gifting 🎁 Just {price} rupees! Message us today!"
+        - "⭐ Customer favorite! This gorgeous {name} won't last long at {price} rupees! DM for instant order 📱"
+        
+        Generate a UNIQUE caption now:
         """
         
         return prompt

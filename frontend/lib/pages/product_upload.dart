@@ -5,6 +5,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:http/http.dart' as http;
 import 'dart:io';
 import 'dart:convert';
+import 'preview_page.dart';
 
 class ProductUploadPage extends StatefulWidget {
   const ProductUploadPage({super.key});
@@ -517,7 +518,28 @@ class _ProductUploadPageState extends State<ProductUploadPage> {
             ),
             
             const SizedBox(height: 24),
-            
+            // Generate & Preview Button
+            SizedBox(
+              height: 50,
+              child: ElevatedButton.icon(
+                onPressed: _isLoading
+                    ? null
+                    : () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const PreviewPage()),
+                        );
+                      },
+                icon: const Icon(Icons.remove_red_eye),
+                label: const Text('Generate & Preview'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.deepPurple,
+                  foregroundColor: Colors.white,
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
             // Submit Button
             SizedBox(
               height: 50,
@@ -530,7 +552,7 @@ class _ProductUploadPageState extends State<ProductUploadPage> {
                       child: CircularProgressIndicator(strokeWidth: 2),
                     )
                   : const Icon(Icons.share),
-                label: Text(_isLoading ? _t('posting') : _t('post')),
+                label: Text(_isLoading ? _t('posting') : 'Post'),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.blue,
                   foregroundColor: Colors.white,

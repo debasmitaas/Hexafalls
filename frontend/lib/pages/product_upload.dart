@@ -341,12 +341,17 @@ class _ProductUploadPageState extends State<ProductUploadPage> {
 
   @override
   Widget build(BuildContext context) {
+    final Color mainPurple = const Color(0xFF6C4DD3);
+    final Color lightPurple = const Color(0xFFB9A7F8);
+    final Color darkPurple = const Color(0xFF4B2FAE);
+    final Color bgPurple = const Color(0xFFEEE9FB);
     return Scaffold(
+      backgroundColor: bgPurple,
       appBar: AppBar(
-        title: Text(_t('appTitle')),
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        backgroundColor: mainPurple,
+        elevation: 0,
+        title: Text(_t('appTitle'), style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
         actions: [
-          // Language toggle
           TextButton(
             onPressed: () {
               setState(() {
@@ -358,275 +363,364 @@ class _ProductUploadPageState extends State<ProductUploadPage> {
               style: const TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 16,
+                color: Colors.white,
               ),
             ),
           ),
         ],
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            // Image Section
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  children: [
-                    Text(
-                      _t('productImage'),
-                      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+      body: Stack(
+        children: [
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            child: Container(
+              height: 120,
+              decoration: BoxDecoration(
+                color: mainPurple,
+                borderRadius: const BorderRadius.only(
+                  bottomLeft: Radius.circular(32),
+                  bottomRight: Radius.circular(32),
+                ),
+              ),
+            ),
+          ),
+          SingleChildScrollView(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // Image Section
+                Card(
+                  elevation: 8,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+                  color: Colors.white,
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      children: [
+                        Row(
+                          children: [
+                            Icon(Icons.image, color: mainPurple, size: 28),
+                            const SizedBox(width: 8),
+                            Text(
+                              _t('productImage'),
+                              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: mainPurple),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 16),
+                        AnimatedSwitcher(
+                          duration: const Duration(milliseconds: 500),
+                          child: _selectedImage != null
+                              ? ClipRRect(
+                                  borderRadius: BorderRadius.circular(16),
+                                  child: Image.file(
+                                    _selectedImage!,
+                                    height: 180,
+                                    width: double.infinity,
+                                    fit: BoxFit.cover,
+                                    key: ValueKey(_selectedImage!.path),
+                                  ),
+                                )
+                              : Container(
+                                  height: 180,
+                                  width: double.infinity,
+                                  decoration: BoxDecoration(
+                                    border: Border.all(color: lightPurple, width: 2),
+                                    borderRadius: BorderRadius.circular(16),
+                                    color: bgPurple,
+                                  ),
+                                  child: const Icon(
+                                    Icons.add_photo_alternate,
+                                    size: 60,
+                                    color: Color(0xFFB9A7F8),
+                                  ),
+                                ),
+                        ),
+                        const SizedBox(height: 16),
+                        ElevatedButton.icon(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: mainPurple,
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            elevation: 4,
+                          ),
+                          onPressed: _pickImage,
+                          icon: const Icon(Icons.photo_camera),
+                          label: Text(_t('selectImage'), style: const TextStyle(fontWeight: FontWeight.bold)),
+                        ),
+                      ],
                     ),
-                    const SizedBox(height: 16),
-                    _selectedImage != null
-                        ? Container(
-                            height: 200,
-                            width: double.infinity,
-                            decoration: BoxDecoration(
-                              border: Border.all(color: Colors.grey),
-                              borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                const SizedBox(height: 18),
+                // Product Name Section
+                Card(
+                  elevation: 6,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                  color: Colors.white,
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(Icons.label, color: mainPurple, size: 24),
+                            const SizedBox(width: 8),
+                            Text(
+                              _t('productName'),
+                              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: mainPurple),
                             ),
-                            child: Image.file(
-                              _selectedImage!,
-                              fit: BoxFit.cover,
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: TextField(
+                                controller: _productNameController,
+                                decoration: InputDecoration(
+                                  hintText: _t('productNameHint'),
+                                  border: const OutlineInputBorder(),
+                                ),
+                              ),
                             ),
+                            const SizedBox(width: 8),
+                            AnimatedSwitcher(
+                              duration: const Duration(milliseconds: 300),
+                              child: IconButton(
+                                key: ValueKey(_isListening && _currentField == 'name'),
+                                onPressed: _speechEnabled 
+                                  ? (_isListening && _currentField == 'name' ? _stopListening : () => _startListening('name'))
+                                  : null,
+                                icon: Icon(
+                                  _isListening && _currentField == 'name' ? Icons.mic_off : Icons.mic,
+                                  color: _isListening && _currentField == 'name' ? Colors.red : mainPurple,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        if (_isListening && _currentField == 'name')
+                          Padding(
+                            padding: const EdgeInsets.only(top: 8.0),
+                            child: Text(
+                              _speechStatus,
+                              style: const TextStyle(color: Colors.red, fontSize: 12),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 18),
+                // Price Section
+                Card(
+                  elevation: 6,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                  color: Colors.white,
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(Icons.attach_money, color: mainPurple, size: 24),
+                            const SizedBox(width: 8),
+                            Text(
+                              _t('price'),
+                              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: mainPurple),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: TextField(
+                                controller: _priceController,
+                                decoration: InputDecoration(
+                                  hintText: _t('priceHint'),
+                                  border: const OutlineInputBorder(),
+                                ),
+                                keyboardType: TextInputType.number,
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            AnimatedSwitcher(
+                              duration: const Duration(milliseconds: 300),
+                              child: IconButton(
+                                key: ValueKey(_isListening && _currentField == 'price'),
+                                onPressed: _speechEnabled 
+                                  ? (_isListening && _currentField == 'price' ? _stopListening : () => _startListening('price'))
+                                  : null,
+                                icon: Icon(
+                                  _isListening && _currentField == 'price' ? Icons.mic_off : Icons.mic,
+                                  color: _isListening && _currentField == 'price' ? Colors.red : mainPurple,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        if (_isListening && _currentField == 'price')
+                          Padding(
+                            padding: const EdgeInsets.only(top: 8.0),
+                            child: Text(
+                              _speechStatus,
+                              style: const TextStyle(color: Colors.red, fontSize: 12),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 28),
+                // Generate & Preview Button
+                AnimatedContainer(
+                  duration: const Duration(milliseconds: 400),
+                  curve: Curves.easeInOut,
+                  child: SizedBox(
+                    height: 50,
+                    child: ElevatedButton.icon(
+                      onPressed: _isLoading
+                          ? null
+                          : () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => const PreviewPage()),
+                              );
+                            },
+                      icon: const Icon(Icons.remove_red_eye),
+                      label: const Text('Generate & Preview'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: darkPurple,
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                        elevation: 6,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 18),
+                // Submit Button
+                AnimatedContainer(
+                  duration: const Duration(milliseconds: 400),
+                  curve: Curves.easeInOut,
+                  child: SizedBox(
+                    height: 50,
+                    child: ElevatedButton.icon(
+                      onPressed: _isLoading ? null : _createAndPostProduct,
+                      icon: _isLoading 
+                        ? const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
                           )
-                        : Container(
-                            height: 200,
-                            width: double.infinity,
-                            decoration: BoxDecoration(
-                              border: Border.all(color: Colors.grey),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: const Icon(
-                              Icons.image,
-                              size: 50,
-                              color: Colors.grey,
-                            ),
-                          ),
-                    const SizedBox(height: 16),
-                    ElevatedButton.icon(
-                      onPressed: _pickImage,
-                      icon: const Icon(Icons.photo_camera),
-                      label: Text(_t('selectImage')),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            
-            const SizedBox(height: 16),
-            
-            // Product Name Section
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      _t('productName'),
-                      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(height: 8),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: TextField(
-                            controller: _productNameController,
-                            decoration: InputDecoration(
-                              hintText: _t('productNameHint'),
-                              border: const OutlineInputBorder(),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        IconButton(
-                          onPressed: _speechEnabled 
-                            ? (_isListening && _currentField == 'name' ? _stopListening : () => _startListening('name'))
-                            : null,
-                          icon: Icon(
-                            _isListening && _currentField == 'name' ? Icons.mic_off : Icons.mic,
-                            color: _isListening && _currentField == 'name' ? Colors.red : Colors.blue,
-                          ),
-                        ),
-                      ],
-                    ),
-                    if (_isListening && _currentField == 'name')
-                      Padding(
-                        padding: const EdgeInsets.only(top: 8.0),
-                        child: Text(
-                          _speechStatus,
-                          style: const TextStyle(color: Colors.red, fontSize: 12),
-                        ),
+                        : const Icon(Icons.share),
+                      label: Text(_isLoading ? _t('posting') : 'Post'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: mainPurple,
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                        elevation: 6,
                       ),
-                  ],
-                ),
-              ),
-            ),
-            
-            const SizedBox(height: 16),
-            
-            // Price Section
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      _t('price'),
-                      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                     ),
-                    const SizedBox(height: 8),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: TextField(
-                            controller: _priceController,
-                            decoration: InputDecoration(
-                              hintText: _t('priceHint'),
-                              border: const OutlineInputBorder(),
-                            ),
-                            keyboardType: TextInputType.number,
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        IconButton(
-                          onPressed: _speechEnabled 
-                            ? (_isListening && _currentField == 'price' ? _stopListening : () => _startListening('price'))
-                            : null,
-                          icon: Icon(
-                            _isListening && _currentField == 'price' ? Icons.mic_off : Icons.mic,
-                            color: _isListening && _currentField == 'price' ? Colors.red : Colors.blue,
-                          ),
-                        ),
-                      ],
-                    ),
-                    if (_isListening && _currentField == 'price')
-                      Padding(
-                        padding: const EdgeInsets.only(top: 8.0),
-                        child: Text(
-                          _speechStatus,
-                          style: const TextStyle(color: Colors.red, fontSize: 12),
-                        ),
-                      ),
-                  ],
+                  ),
                 ),
-              ),
+                const SizedBox(height: 18),
+                // Instructions
+                // Card(
+                //   elevation: 2,
+                //   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                //   color: Colors.white,
+                //   child: Padding(
+                //     padding: const EdgeInsets.all(16.0),
+                //     child: Column(
+                //       crossAxisAlignment: CrossAxisAlignment.start,
+                //       children: [
+                //         Row(
+                //           children: [
+                //             Icon(Icons.info_outline, color: mainPurple),
+                //             const SizedBox(width: 8),
+                //             Text(
+                //               _t('instructions'),
+                //               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: mainPurple),
+                //             ),
+                //           ],
+                //         ),
+                //         const SizedBox(height: 8),
+                //         Text(_t('step1'), style: const TextStyle(fontSize: 14)),
+                //         Text(_t('step2'), style: const TextStyle(fontSize: 14)),
+                //         Text(_t('step3'), style: const TextStyle(fontSize: 14)),
+                //         Text(_t('step4'), style: const TextStyle(fontSize: 14)),
+                //         const SizedBox(height: 8),
+                //         Text(
+                //           _t('serverNote'),
+                //           style: const TextStyle(fontStyle: FontStyle.italic, color: Colors.grey),
+                //         ),
+                //       ],
+                //     ),
+                //   ),
+                // ),
+                // const SizedBox(height: 10),
+                // // Debug Info
+                // Card(
+                //   elevation: 1,
+                //   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                //   color: Colors.white,
+                //   child: Padding(
+                //     padding: const EdgeInsets.all(16.0),
+                //     child: Column(
+                //       crossAxisAlignment: CrossAxisAlignment.start,
+                //       children: [
+                //         Row(
+                //           children: [
+                //             Icon(Icons.bug_report, color: mainPurple),
+                //             const SizedBox(width: 8),
+                //             Text(
+                //               _t('debugInfo'),
+                //               style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: mainPurple),
+                //             ),
+                //           ],
+                //         ),
+                //         const SizedBox(height: 4),
+                //         Text('${_t('speechAvailable')}: ${_speechEnabled ? "Yes" : "No"}', 
+                //              style: const TextStyle(fontSize: 12)),
+                //         Text('${_t('listening')}: ${_isListening ? "Yes" : "No"}', 
+                //              style: const TextStyle(fontSize: 12)),
+                //         Text('${_t('status')}: $_speechStatus', 
+                //              style: const TextStyle(fontSize: 12)),
+                //         const SizedBox(height: 8),
+                //         ElevatedButton(
+                //           style: ElevatedButton.styleFrom(
+                //             backgroundColor: mainPurple,
+                //             foregroundColor: Colors.white,
+                //             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                //           ),
+                //           onPressed: () async {
+                //             var status = await Permission.microphone.status;
+                //             _showSnackBar('Microphone permission: \\${status.toString()}');
+                //             if (!status.isGranted) {
+                //               status = await Permission.microphone.request();
+                //               _showSnackBar('After request: \\${status.toString()}');
+                //             }
+                //           },
+                //           child: Text(_t('testMic'), style: const TextStyle(fontWeight: FontWeight.bold)),
+                //         ),
+                //       ],
+                //     ),
+                //   ),
+                // ),
+                const SizedBox(height: 24),
+              ],
             ),
-            
-            const SizedBox(height: 24),
-            // Generate & Preview Button
-            SizedBox(
-              height: 50,
-              child: ElevatedButton.icon(
-                onPressed: _isLoading
-                    ? null
-                    : () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const PreviewPage()),
-                        );
-                      },
-                icon: const Icon(Icons.remove_red_eye),
-                label: const Text('Generate & Preview'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.deepPurple,
-                  foregroundColor: Colors.white,
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
-            // Submit Button
-            SizedBox(
-              height: 50,
-              child: ElevatedButton.icon(
-                onPressed: _isLoading ? null : _createAndPostProduct,
-                icon: _isLoading 
-                  ? const SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                  : const Icon(Icons.share),
-                label: Text(_isLoading ? _t('posting') : 'Post'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue,
-                  foregroundColor: Colors.white,
-                ),
-              ),
-            ),
-            
-            const SizedBox(height: 16),
-            
-            // Instructions
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      _t('instructions'),
-                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(_t('step1')),
-                    Text(_t('step2')),
-                    Text(_t('step3')),
-                    Text(_t('step4')),
-                    const SizedBox(height: 8),
-                    Text(
-                      _t('serverNote'),
-                      style: const TextStyle(fontStyle: FontStyle.italic, color: Colors.grey),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            
-            const SizedBox(height: 8),
-            
-            // Debug Info
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      _t('debugInfo'),
-                      style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(height: 4),
-                    Text('${_t('speechAvailable')}: ${_speechEnabled ? "Yes" : "No"}', 
-                         style: const TextStyle(fontSize: 12)),
-                    Text('${_t('listening')}: ${_isListening ? "Yes" : "No"}', 
-                         style: const TextStyle(fontSize: 12)),
-                    Text('${_t('status')}: $_speechStatus', 
-                         style: const TextStyle(fontSize: 12)),
-                    const SizedBox(height: 8),
-                    ElevatedButton(
-                      onPressed: () async {
-                        var status = await Permission.microphone.status;
-                        _showSnackBar('Microphone permission: ${status.toString()}');
-                        
-                        if (!status.isGranted) {
-                          status = await Permission.microphone.request();
-                          _showSnackBar('After request: ${status.toString()}');
-                        }
-                      },
-                      child: Text(_t('testMic')),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

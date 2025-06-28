@@ -33,6 +33,8 @@ class Settings(BaseSettings):
     # Instagram API
     instagram_business_account_id: Optional[str] = None
     instagram_access_token: Optional[str] = None
+    instagram_username: Optional[str] = None
+    instagram_password: Optional[str] = None
     
     # File Upload
     upload_folder: str = "uploads"

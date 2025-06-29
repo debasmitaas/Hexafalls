@@ -531,9 +531,9 @@ class _ProductUploadPageState extends State<ProductUploadPage> {
                           children: [
                             Icon(Icons.attach_money, color: mainPurple, size: 24),
                             const SizedBox(width: 8),
-                            Text(
-                              _t('price'),
-                              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: mainPurple),
+                            const Text(
+                              'Price (₹)',
+                              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF6C4DD3)),
                             ),
                           ],
                         ),
@@ -543,9 +543,10 @@ class _ProductUploadPageState extends State<ProductUploadPage> {
                             Expanded(
                               child: TextField(
                                 controller: _priceController,
-                                decoration: InputDecoration(
-                                  hintText: _t('priceHint'),
-                                  border: const OutlineInputBorder(),
+                                decoration: const InputDecoration(
+                                  hintText: 'Enter price',
+                                  border: OutlineInputBorder(),
+                                  prefixText: '₹ ',
                                 ),
                                 keyboardType: TextInputType.number,
                               ),

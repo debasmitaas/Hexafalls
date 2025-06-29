@@ -131,6 +131,8 @@ class SocialMediaAutomationService:
         # Post to Instagram using InstagramService with username/password
         if "instagram" in platforms:
             try:
+                print(f"📸 Posting to Instagram with caption: {caption[:100]}...")
+                
                 ig_result = await self.instagram_service.post_photo(
                     image_path=image_path,
                     caption=caption
@@ -141,7 +143,7 @@ class SocialMediaAutomationService:
                     "message": ig_result.get("message", ig_result.get("error", "Unknown error"))
                 }
                 if ig_result["success"]:
-                    print(f"✅ Instagram post successful!")
+                    print(f"✅ Instagram post successful! Post ID: {ig_result.get('post_id')}")
                 else:
                     print(f"❌ Instagram post failed: {ig_result.get('error')}")
             except Exception as e:
@@ -151,6 +153,8 @@ class SocialMediaAutomationService:
                     "message": f"Error: {str(e)}"
                 }
                 print(f"❌ Instagram posting exception: {str(e)}")
+                import traceback
+                traceback.print_exc()
 
         return results
     

@@ -65,11 +65,11 @@ class InstagramService:
         price: float = None
     ) -> Dict[str, Any]:
         """
-        Post a photo to Instagram with Gemini-generated caption
+        Post a photo to Instagram
         
         Args:
             image_path: Path to the image file
-            caption: Gemini-generated caption for the post
+            caption: Caption for the post
             product_name: Name of the product (optional)
             price: Price of the product (optional)
             
@@ -102,14 +102,14 @@ class InstagramService:
                 }
         
         try:
-            logger.info(f"📸 Posting to Instagram: {product_name} with Gemini caption")
-            logger.info(f"📝 Caption preview: {caption[:100]}...")
+            logger.info(f"📸 Posting to Instagram: {product_name} - {image_path}")
+            logger.info(f"📝 Caption: {caption[:100]}...")
             
-            # Upload photo with Gemini-generated caption using instabot
+            # Upload photo with caption using instabot
             result = self.bot.upload_photo(image_path, caption=caption)
             
             if result:
-                logger.info("✅ Photo with Gemini caption posted to Instagram successfully!")
+                logger.info("✅ Photo posted to Instagram successfully!")
                 
                 # Try to get the post ID
                 post_id = None
@@ -117,16 +117,15 @@ class InstagramService:
                     # Get the last uploaded media ID
                     if hasattr(self.bot, 'last_media_id') and self.bot.last_media_id:
                         post_id = str(self.bot.last_media_id)
-                        logger.info(f"📌 Instagram Post ID: {post_id}")
+                        logger.info(f"📱 Instagram Post ID: {post_id}")
                 except:
                     pass
                 
                 return {
                     "success": True,
-                    "message": "Photo with Gemini caption posted successfully to Instagram",
+                    "message": "Photo posted successfully to Instagram",
                     "post_id": post_id,
-                    "username": settings.instagram_username,
-                    "caption_used": caption
+                    "username": settings.instagram_username
                 }
             else:
                 logger.error("❌ Failed to upload photo to Instagram")

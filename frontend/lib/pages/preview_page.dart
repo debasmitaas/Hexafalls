@@ -46,23 +46,33 @@ class _PreviewPageState extends State<PreviewPage> {
         }),
       ).timeout(const Duration(seconds: 30)); // Increased timeout for AI generation
 
+      print('AI Caption Response Status: ${response.statusCode}');
+      print('AI Caption Response Body: ${response.body}');
+
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         setState(() {
           // Only use fallback if the backend truly failed to provide a caption
           if (data['caption'] != null && data['caption'].toString().trim().isNotEmpty) {
             generatedCaption = data['caption'];
+            print('✅ Generated caption: $generatedCaption');
           } else {
             // Show a clear error message instead of generic fallback
             generatedCaption = 'AI caption generation failed. Please try again or enter a custom caption.';
+            print('❌ No caption in response: $data');
           }
+        });
+      } else {
+        print('❌ AI Caption generation failed with status: ${response.statusCode}');
+        setState(() {
+          generatedCaption = 'Unable to generate AI caption (Status: ${response.statusCode}). Please check your connection and try again.';
         });
       }
     } catch (e) {
-      debugPrint('Error generating caption: $e');
+      print('❌ Error generating caption: $e');
       setState(() {
         // Show informative error message instead of generic fallback
-        generatedCaption = 'Unable to generate AI caption. Please check your connection and try again.';
+        generatedCaption = 'Unable to generate AI caption. Please check your connection and try again. Error: $e';
       });
     } finally {
       setState(() {
@@ -87,6 +97,7 @@ class _PreviewPageState extends State<PreviewPage> {
         Uri.parse('$backendUrl/native_products/create-and-post-native'),
       );
 
+      // Add the image file
       request.files.add(
         await http.MultipartFile.fromPath('file', widget.imagePath!),
       );
@@ -94,13 +105,23 @@ class _PreviewPageState extends State<PreviewPage> {
       request.fields['product_name'] = widget.productName!;
       request.fields['price'] = widget.price!;
       
-      // Send the generated caption if available
-      if (generatedCaption != null) {
+      // Send the generated caption if available (this is key!)
+      if (generatedCaption != null && generatedCaption!.trim().isNotEmpty) {
         request.fields['caption'] = generatedCaption!;
+        print('📝 Sending caption to backend: $generatedCaption');
       }
+
+      print('🚀 Posting to backend with:');
+      print('- Product: ${widget.productName}');
+      print('- Price: ${widget.price}');
+      print('- Caption: ${generatedCaption ?? "None"}');
+      print('- Image: ${widget.imagePath}');
 
       var response = await request.send();
       var responseBody = await response.stream.bytesToString();
+
+      print('📊 Backend Response Status: ${response.statusCode}');
+      print('📊 Backend Response Body: $responseBody');
 
       if (response.statusCode == 200) {
         var jsonResponse = json.decode(responseBody);
@@ -109,6 +130,7 @@ class _PreviewPageState extends State<PreviewPage> {
         _showSnackBar('Error: ${response.statusCode} - $responseBody');
       }
     } catch (e) {
+      print('❌ Network error: $e');
       _showSnackBar('Network error: $e');
     } finally {
       setState(() {

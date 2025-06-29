@@ -260,10 +260,19 @@ class _ProductUploadPageState extends State<ProductUploadPage> {
         Uri.parse('$backendUrl/native_products/create-and-post-native'),
       );
 
-      // Add the image file
+      // Add the image file as bytes (blob/array)
+      // This automatically reads the image as byte array and sends it
       request.files.add(
-        await http.MultipartFile.fromPath('file', _selectedImage!.path),
+        await http.MultipartFile.fromPath(
+          'file', 
+          _selectedImage!.path,
+          filename: 'product_image.jpg', // Ensure proper filename
+        ),
       );
+
+      print('📸 Sending image to backend: ${_selectedImage!.path}');
+      print('📝 Product: ${_productNameController.text}');
+      print('💰 Price: ${_priceController.text}');
 
       // Add other fields
       request.fields['product_name'] = _productNameController.text;
@@ -272,15 +281,20 @@ class _ProductUploadPageState extends State<ProductUploadPage> {
       var response = await request.send();
       var responseBody = await response.stream.bytesToString();
 
+      print('📊 Backend Response Status: ${response.statusCode}');
+      print('📊 Backend Response: $responseBody');
+
       if (response.statusCode == 200) {
         var jsonResponse = json.decode(responseBody);
         _showSuccessDialog(jsonResponse);
         _resetForm();
       } else {
         _showSnackBar('Error: ${response.statusCode} - $responseBody');
+        print('❌ Backend Error: $responseBody');
       }
     } catch (e) {
       _showSnackBar('Network error: $e');
+      print('❌ Network Error: $e');
     } finally {
       setState(() {
         _isLoading = false;
@@ -314,12 +328,22 @@ class _ProductUploadPageState extends State<ProductUploadPage> {
             children: [
               Text(_t('productPosted')),
               const SizedBox(height: 10),
+              // Show the AI caption from the response
+              if (response['product'] != null && response['product']['ai_caption'] != null)
+                Text('AI Caption: ${response['product']['ai_caption']}', 
+                     style: const TextStyle(fontWeight: FontWeight.bold)),
+              if (response['product'] != null && response['product']['facebook_post_id'] != null)
+                Text('Facebook Post ID: ${response['product']['facebook_post_id']}'),
+              if (response['product'] != null && response['product']['instagram_post_id'] != null)
+                Text('Instagram Post ID: ${response['product']['instagram_post_id']}'),
+              // Fallback for old response format
+              if (response['ai_caption'] != null)
+                Text('AI Caption: ${response['ai_caption']}', 
+                     style: const TextStyle(fontWeight: FontWeight.bold)),
               if (response['facebook_post_id'] != null)
                 Text('Facebook Post ID: ${response['facebook_post_id']}'),
               if (response['instagram_post_id'] != null)
                 Text('Instagram Post ID: ${response['instagram_post_id']}'),
-              if (response['ai_caption'] != null)
-                Text('AI Caption: ${response['ai_caption']}'),
             ],
           ),
           actions: [
@@ -337,6 +361,19 @@ class _ProductUploadPageState extends State<ProductUploadPage> {
   String _t(String key) {
     final lang = _isBengali ? 'bn' : 'en';
     return _translations[lang]?[key] ?? key;
+  }
+
+  void _navigateToPreview() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => PreviewPage(
+          imagePath: _selectedImage?.path,
+          productName: _productNameController.text,
+          price: _priceController.text,
+        ),
+      ),
+    );
   }
 
   @override

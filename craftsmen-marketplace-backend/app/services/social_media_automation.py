@@ -7,6 +7,7 @@ import json
 
 from app.core.config import settings
 from app.services.ai_service import AIService
+from app.services.instagram_service_new import InstagramService
 from app.schemas.schemas import SocialMediaPostResponse
 
 
@@ -19,7 +20,10 @@ class SocialMediaAutomationService:
         if settings.facebook_access_token:
             self.facebook_api = facebook.GraphAPI(access_token=settings.facebook_access_token)
         
-        # Initialize Instagram API
+        # Initialize Instagram Service with username/password
+        self.instagram_service = InstagramService()
+        
+        # Keep instagrapi as backup (if needed)
         self.instagram_client = None
         if settings.instagram_access_token:
             self.instagram_client = Client()
@@ -124,21 +128,30 @@ class SocialMediaAutomationService:
                     "message": f"Error: {str(e)}"
                 }
         
-        if "instagram" in platforms and self.instagram_client:
+        # Post to Instagram using InstagramService with username/password
+        if "instagram" in platforms:
             try:
-                ig_result = await self._post_to_instagram(image_path, caption)
+                ig_result = await self.instagram_service.post_photo(
+                    image_path=image_path,
+                    caption=caption
+                )
                 results["instagram"] = {
-                    "success": ig_result is not None,
-                    "post_id": ig_result,
-                    "message": "Posted successfully" if ig_result else "Failed to post"
+                    "success": ig_result["success"],
+                    "post_id": ig_result.get("post_id"),
+                    "message": ig_result.get("message", ig_result.get("error", "Unknown error"))
                 }
+                if ig_result["success"]:
+                    print(f"✅ Instagram post successful!")
+                else:
+                    print(f"❌ Instagram post failed: {ig_result.get('error')}")
             except Exception as e:
                 results["instagram"] = {
                     "success": False,
                     "post_id": None,
                     "message": f"Error: {str(e)}"
                 }
-        
+                print(f"❌ Instagram posting exception: {str(e)}")
+
         return results
     
     async def _post_to_facebook(self, image_path: str, caption: str) -> Optional[str]:

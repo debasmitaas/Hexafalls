@@ -10,3 +10,52 @@ wheels/
 .venv
 .env
 *.env.example
+
+# Configuration files with sensitive data
+.env.local
+.env.production
+config.py
+app/core/config.py
+
+# API Keys and credentials
+credentials/
+api_keys.json
+credentials.json
+*.key
+*.pem
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+craftsmen_marketplace.db
+
+# Instagram bot files
+config/
+sessions/
+*.session
+
+# Upload files (optional - uncomment to ignore uploads)
+# uploads/
+# static/uploads/
+
+# Log files
+*.log
+logs/
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# FastAPI specific
+.pytest_cache/
+
+# Temporary files
+*.tmp
+*.temp

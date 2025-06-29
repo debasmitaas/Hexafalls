@@ -42,9 +42,9 @@ class _PreviewPageState extends State<PreviewPage> {
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
           'product_name': widget.productName,
-          'price': widget.price,
+          'price': double.tryParse(widget.price ?? '0') ?? 0.0,
         }),
-      );
+      ).timeout(const Duration(seconds: 30)); // Increased timeout for AI generation
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);

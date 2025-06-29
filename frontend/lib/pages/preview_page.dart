@@ -243,7 +243,7 @@ class _PreviewPageState extends State<PreviewPage> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               const Text(
-                                'Craftsmen Marketplace',
+                                'ShilpoSphere',
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 16,

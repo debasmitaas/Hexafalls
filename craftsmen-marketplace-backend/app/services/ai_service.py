@@ -87,29 +87,10 @@ class AIService:
     def _create_caption_prompt(self, name: str, description: str, price: float, category: str) -> str:
         """Create a prompt for caption generation"""
         
-        # Add variety to opening phrases
-        opening_phrases = [
-            "Take this beautiful", "Grab this stunning", "Get this amazing", 
-            "Don't miss this gorgeous", "Check out this incredible", "Love this beautiful",
-            "Want this stunning", "Need this perfect", "Discover this elegant"
-        ]
-        
-        # Add variety to ending phrases  
-        ending_phrases = [
-            "DM for more info 📩", "Message us for details 💬", "Contact us now 📞",
-            "DM us today 💌", "Send us a message 📱", "WhatsApp us 💬"
-        ]
-        
-        # Add variety to descriptive words
-        descriptive_words = [
-            "perfect", "amazing", "gorgeous", "elegant", "stunning", "beautiful", 
-            "incredible", "fantastic", "wonderful", "lovely", "exquisite"
-        ]
-        
         prompt = f"""
-        Create a UNIQUE and catchy social media caption for a handcrafted product:
-        
-        Product Name: {name}
+        Write a ready-to-post social media caption for this handcrafted product:
+
+        Product: {name}
         """
         
         if description:
@@ -122,46 +103,54 @@ class AIService:
             prompt += f"Category: {category}\n"
         
         prompt += f"""
-        Requirements:
-        1. Use DIFFERENT opening phrases like: {', '.join(opening_phrases[:3])}... (be creative!)
-        2. Include the price: "only for {price} rupees" or "just {price} rupees"
-        3. Use DIFFERENT ending phrases like: {', '.join(ending_phrases[:3])}... (vary it!)
-        4. Add emojis: ✨🛍️💎🌟💖🎉🔥💯⭐
-        5. Use descriptive words: {', '.join(descriptive_words[:4])}...
-        6. Add urgency words: "limited", "hurry", "don't miss", "grab now"
-        7. Include trending hashtags
-        8. Maximum 250 characters
-        9. BE CREATIVE AND DIFFERENT each time!
-        10. Vary the sentence structure completely
         
-        IMPORTANT: Generate a COMPLETELY DIFFERENT caption style each time. Don't repeat patterns!
+        CRITICAL INSTRUCTIONS:
+        - Write ONLY the caption text that can be directly posted
+        - DO NOT write "Here are some ideas" or "Here's a caption" 
+        - DO NOT give suggestions or options
+        - Write ONE complete, ready-to-use caption
+        - MUST include the EXACT price: {price} rupees (not [Price] or placeholder)
+        - MUST include "DM to order" or "DM us to order" in the caption
+        - Include emojis naturally in the text
+        - End with relevant hashtags (at least 5 hashtags)
+        - Make it engaging and sales-focused
+        - Keep it under 280 characters
+        - Use Bangladeshi/local context
+        - Be direct and persuasive
         
-        Example variations:
-        - "🔥 Limited stock! This {name} is flying off our shelves! Only {price} rupees - grab yours before it's gone! 💯 WhatsApp us now!"
-        - "💖 Fall in love with this {name}! Perfect for gifting 🎁 Just {price} rupees! Message us today!"
-        - "⭐ Customer favorite! This gorgeous {name} won't last long at {price} rupees! DM for instant order 📱"
+        Example format: "Amazing handcrafted [product]! ✨ Only {price} rupees! Perfect for [use case] 💖 DM to order now! #handmade #bangladesh #crafts #quality #affordable"
         
-        Generate a UNIQUE caption now:
+        Write the caption now:
         """
         
         return prompt
     
     def _extract_hashtags(self, text: str) -> List[str]:
         """Extract hashtags from the generated text"""
-        words = text.split()
-        hashtags = [word for word in words if word.startswith('#')]
+        import re
         
-        # If no hashtags found, add default ones
+        # Find all hashtags in the text
+        hashtags = re.findall(r'#\w+', text)
+        
+        # If no hashtags found, add relevant default ones
         if not hashtags:
-            hashtags = ["#handmade", "#craftsmanship", "#artisan", "#unique"]
+            hashtags = ["#handmade", "#crafts", "#bangladesh", "#supportlocalwork", "#quality", "#affordable", "#beautiful"]
         
         return hashtags
     
     def _clean_caption(self, text: str) -> str:
-        """Remove hashtags from the main caption text"""
-        words = text.split()
-        clean_words = [word for word in words if not word.startswith('#')]
-        return ' '.join(clean_words).strip()
+        """Clean up the caption text"""
+        import re
+        
+        # Remove any intro phrases like "Here's a caption:" etc.
+        text = re.sub(r'^(Here\'s a caption|Here are some ideas|Caption idea|Suggested caption).*?:', '', text, flags=re.IGNORECASE)
+        text = re.sub(r'^(Here\'s|Here are).*?:', '', text, flags=re.IGNORECASE)
+        
+        # Clean up extra whitespace and newlines
+        text = ' '.join(text.split())
+        
+        # Return the full text including hashtags - we want everything together
+        return text.strip()
     
     async def generate_comment_response(self, original_comment: str, product_context: str) -> str:
         """

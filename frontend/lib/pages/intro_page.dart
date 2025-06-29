@@ -35,12 +35,12 @@ class IntroPage extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   // Left: Hero content
-                  Expanded(
-                    flex: 2,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
+                  // Expanded(
+                    // flex: 2,
+                    // child: Column(
+                      // mainAxisAlignment: MainAxisAlignment.center,
+                      // crossAxisAlignment: CrossAxisAlignment.center,
+                      // children: [
                         // Logo placeholder
                         Container(
                           width: 80,
@@ -114,64 +114,64 @@ class IntroPage extends StatelessWidget {
                       ],
                     ),
                   ),
-                  const SizedBox(width: 40),
-                  // Right: Phone mockup
-                  Expanded(
-                    flex: 2,
-                    child: Center(
-                      child: Container(
-                        width: 260,
-                        height: 520,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(40),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.08),
-                              blurRadius: 24,
-                              offset: const Offset(0, 8),
-                            ),
-                          ],
-                          border: Border.all(color: mustard, width: 3),
-                        ),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            // Phone notch
-                            Container(
-                              margin: const EdgeInsets.symmetric(vertical: 12),
-                              width: 60,
-                              height: 6,
-                              decoration: BoxDecoration(
-                                color: Colors.grey[300],
-                                borderRadius: BorderRadius.circular(3),
-                              ),
-                            ),
-                            // Terracotta craft image
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(24),
-                              child: Image.asset(
-                                'assets/images/terracotta_craft.jpg',
-                                width: 200,
-                                height: 160,
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                            const Spacer(),
-                            // Facebook logo (optional)
-                            Padding(
-                              padding: const EdgeInsets.only(bottom: 18.0),
-                              child: Icon(Icons.facebook, color: Colors.blue[800], size: 32),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
+                //   const SizedBox(width: 40),
+                //   // Right: Phone mockup
+                //   Expanded(
+                //     flex: 2,
+                //     child: Center(
+                //       child: Container(
+                //         width: 260,
+                //         height: 520,
+                //         decoration: BoxDecoration(
+                //           color: Colors.white,
+                //           borderRadius: BorderRadius.circular(40),
+                //           boxShadow: [
+                //             BoxShadow(
+                //               color: Colors.black.withOpacity(0.08),
+                //               blurRadius: 24,
+                //               offset: const Offset(0, 8),
+                //             ),
+                //           ],
+                //           border: Border.all(color: mustard, width: 3),
+                //         ),
+                //         child: Column(
+                //           mainAxisAlignment: MainAxisAlignment.start,
+                //           children: [
+                //             // Phone notch
+                //             Container(
+                //               margin: const EdgeInsets.symmetric(vertical: 12),
+                //               width: 60,
+                //               height: 6,
+                //               decoration: BoxDecoration(
+                //                 color: Colors.grey[300],
+                //                 borderRadius: BorderRadius.circular(3),
+                //               ),
+                //             ),
+                //             // Terracotta craft image
+                //             ClipRRect(
+                //               borderRadius: BorderRadius.circular(24),
+                //               child: Image.asset(
+                //                 'assets/images/terracotta_craft.jpg',
+                //                 width: 200,
+                //                 height: 160,
+                //                 fit: BoxFit.cover,
+                //               ),
+                //             ),
+                //             const Spacer(),
+                //             // Facebook logo (optional)
+                //             Padding(
+                //               padding: const EdgeInsets.only(bottom: 18.0),
+                //               child: Icon(Icons.facebook, color: Colors.blue[800], size: 32),
+                //             ),
+                //           ],
+                //         ),
+                //       ),
+                //     ),
+                //   ),
+                // ],
               ),
-            ),
-          ),
+            // ),
+          // ),
         ],
       ),
     );

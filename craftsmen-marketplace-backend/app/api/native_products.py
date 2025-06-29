@@ -138,9 +138,11 @@ async def create_product_and_auto_post_native(
         hashtags = [tag.replace('#', '') for tag in hashtag_matches]
         
         print(f"✅ Using frontend-provided caption: {caption[:50]}...")
+        print(f"📝 Full caption: {caption}")
         
     else:
         print("🤖 No caption provided from frontend, generating new one...")
+        print(f"🔍 Caption value received: '{caption}'")
         # Generate new caption using AI
         ai_agent = get_ai_agent()
         

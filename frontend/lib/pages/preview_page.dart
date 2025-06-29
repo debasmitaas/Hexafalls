@@ -348,7 +348,7 @@ class _PreviewPageState extends State<PreviewPage> {
                           const SizedBox(height: 4),
                           if (widget.price != null)
                             Text(
-                              '৳ ${widget.price}',
+                              '₹ ${widget.price}',
                               style: TextStyle(
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold,

@@ -21,7 +21,7 @@ class _PreviewPageState extends State<PreviewPage> {
   bool isPosting = false;
   
   // Backend URL - same as in product_upload.dart
-  static const String backendUrl = 'http://192.168.1.100:8000';
+  static const String backendUrl = 'http://192.168.133.28:8000';
 
   @override
   void initState() {
@@ -49,13 +49,20 @@ class _PreviewPageState extends State<PreviewPage> {
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         setState(() {
-          generatedCaption = data['caption'] ?? 'Check out this amazing product! 🛍️ #handmade #craftsmen';
+          // Only use fallback if the backend truly failed to provide a caption
+          if (data['caption'] != null && data['caption'].toString().trim().isNotEmpty) {
+            generatedCaption = data['caption'];
+          } else {
+            // Show a clear error message instead of generic fallback
+            generatedCaption = 'AI caption generation failed. Please try again or enter a custom caption.';
+          }
         });
       }
     } catch (e) {
       debugPrint('Error generating caption: $e');
       setState(() {
-        generatedCaption = '🌟 ${widget.productName} - Only ${widget.price} 🌟\n\n#handmade #craftsmen #marketplace #quality';
+        // Show informative error message instead of generic fallback
+        generatedCaption = 'Unable to generate AI caption. Please check your connection and try again.';
       });
     } finally {
       setState(() {
@@ -86,6 +93,11 @@ class _PreviewPageState extends State<PreviewPage> {
 
       request.fields['product_name'] = widget.productName!;
       request.fields['price'] = widget.price!;
+      
+      // Send the generated caption if available
+      if (generatedCaption != null) {
+        request.fields['caption'] = generatedCaption!;
+      }
 
       var response = await request.send();
       var responseBody = await response.stream.bytesToString();
@@ -138,6 +150,44 @@ class _PreviewPageState extends State<PreviewPage> {
                 Navigator.of(context).pop(); // Go back to upload page
               },
               child: const Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _editCaption() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        String editedCaption = generatedCaption ?? '';
+        return AlertDialog(
+          title: const Text('Edit Caption'),
+          content: TextField(
+            controller: TextEditingController(text: editedCaption),
+            maxLines: 5,
+            decoration: const InputDecoration(
+              hintText: 'Enter your caption...',
+              border: OutlineInputBorder(),
+            ),
+            onChanged: (value) {
+              editedCaption = value;
+            },
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                setState(() {
+                  generatedCaption = editedCaption;
+                });
+                Navigator.of(context).pop();
+              },
+              child: const Text('Save'),
             ),
           ],
         );
@@ -230,12 +280,28 @@ class _PreviewPageState extends State<PreviewPage> {
                                 const Text('Generating caption...'),
                               ],
                             )
-                          : Text(
-                              generatedCaption!,
-                              style: const TextStyle(
-                                fontSize: 15,
-                                height: 1.4,
-                              ),
+                          : Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        generatedCaption!,
+                                        style: const TextStyle(
+                                          fontSize: 15,
+                                          height: 1.4,
+                                        ),
+                                      ),
+                                    ),
+                                    IconButton(
+                                      icon: Icon(Icons.edit, size: 20, color: mainPurple),
+                                      onPressed: () => _editCaption(),
+                                      tooltip: 'Edit caption',
+                                    ),
+                                  ],
+                                ),
+                              ],
                             ),
                     ),
                   

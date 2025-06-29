@@ -75,10 +75,12 @@ async def upload_product_image(
 @router.post("/create-and-post-native", response_model=Dict[str, Any])
 async def create_product_and_auto_post_native(
     image_file: UploadFile = File(...),
-    name: str = Form(...),
+    product_name: str = Form(..., alias="product_name"),  # Accept both name and product_name
+    name: Optional[str] = Form(None),  # For backward compatibility
     price: float = Form(...),
     description: Optional[str] = Form(None),
     category: Optional[str] = Form(None),
+    caption: Optional[str] = Form(None),  # Accept pre-generated caption
     owner_id: int = Form(1),
     platforms: str = Form('["facebook", "instagram"]'),  # JSON string from FlutterFlow
     db: Session = Depends(get_db)
@@ -88,12 +90,17 @@ async def create_product_and_auto_post_native(
     generate AI caption with Google ADK, and auto-post to social media
     """
     
+    # Handle name field (support both 'name' and 'product_name')
+    product_name_value = product_name or name
+    if not product_name_value:
+        raise HTTPException(status_code=400, detail="Product name is required")
+    
     # Upload image first
     image_upload = await upload_product_image(file=image_file, db=db)
     
     # Create product in database
     db_product = Product(
-        name=name,
+        name=product_name_value,
         description=description,
         price=price,
         category=category,
@@ -114,51 +121,70 @@ async def create_product_and_auto_post_native(
     except:
         platforms_list = ["facebook", "instagram"]  # fallback
     
-    # Use enhanced Google AI Agent for caption generation
-    ai_agent = get_ai_agent()
-    
-    # Determine platform for optimization
-    platform_target = "both"
-    if len(platforms_list) == 1:
-        platform_target = platforms_list[0]
-    
-    # Generate enhanced content using Google ADK
-    try:
-        enhanced_content = await ai_agent.generate_enhanced_content(
-            product_name=name,
-            price=price,
-            category=category,
-            description=description,
-            target_audience="craft enthusiasts and art lovers",
-            platform=platform_target
-        )
-        
-        # Extract platform-specific content
-        platform_content = enhanced_content.get("platform_content", {})
-        ai_caption = enhanced_content.get("base_caption", "")
-        hashtags = enhanced_content.get("hashtags", [])
-        marketing_insights = enhanced_content.get("marketing_insights", {})
-        
-    except Exception as e:
-        print(f"Enhanced AI agent failed, using fallback: {e}")
-        # Fallback to basic AI service
-        ai_caption = await ai_service.generate_product_caption(
-            name=name,
-            price=price,
-            description=description or "",
-            category=category or "handmade"
-        )
+    # Use enhanced Google AI Agent for caption generation (only if no caption provided)
+    if caption:
+        # Use the provided caption from frontend
+        ai_caption = caption
         platform_content = {
-            "instagram": ai_caption,
-            "facebook": ai_caption
+            "instagram": caption,
+            "facebook": caption
         }
-        hashtags = ["#handmade", "#crafts", "#artisan"]
-        marketing_insights = {"fallback_used": True}
+        hashtags = []  # Extract hashtags from caption if needed
+        marketing_insights = {"caption_source": "frontend_preview"}
+        
+        # Extract hashtags from the provided caption
+        import re
+        hashtag_matches = re.findall(r'#\w+', caption)
+        hashtags = [tag.replace('#', '') for tag in hashtag_matches]
+        
+    else:
+        # Generate new caption using AI
+        ai_agent = get_ai_agent()
+        
+        # Determine platform for optimization
+        platform_target = "both"
+        if len(platforms_list) == 1:
+            platform_target = platforms_list[0]
+        
+        # Generate enhanced content using Google ADK
+        try:
+            enhanced_content = await ai_agent.generate_enhanced_content(
+                product_name=product_name_value,
+                price=price,
+                category=category,
+                description=description,
+                target_audience="craft enthusiasts and art lovers",
+                platform=platform_target
+            )
+            
+            # Extract platform-specific content
+            platform_content = enhanced_content.get("platform_content", {})
+            ai_caption = enhanced_content.get("base_caption", "")
+            hashtags = enhanced_content.get("hashtags", [])
+            marketing_insights = enhanced_content.get("marketing_insights", {})
+            
+        except Exception as e:
+            print(f"Enhanced AI agent failed, using fallback: {e}")
+            # Fallback to basic AI service
+            ai_caption_response = await ai_service.generate_product_caption(
+                product_name=product_name_value,
+                product_description=description or "",
+                price=price,
+                category=category or "handmade"
+            )
+            # Extract the actual caption string from the response
+            ai_caption = ai_caption_response.caption
+            platform_content = {
+                "instagram": ai_caption,
+                "facebook": ai_caption
+            }
+            hashtags = ai_caption_response.hashtags
+            marketing_insights = {"fallback_used": True}
     
     # Use social media automation with enhanced content
     automation_result = await social_automation.create_and_post_product_with_content(
         image_path=image_path,
-        product_name=name,
+        product_name=product_name_value,
         price=price,
         description=description,
         category=category,

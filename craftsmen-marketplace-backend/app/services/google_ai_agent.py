@@ -19,7 +19,7 @@ class GoogleAIAgent:
     def __init__(self):
         # Configure Gemini
         genai.configure(api_key=settings.gemini_api_key)
-        self.model = genai.GenerativeModel('gemini-pro')
+        self.model = genai.GenerativeModel('gemini-2.0-flash')
     
     async def generate_enhanced_content(
         self,
@@ -98,7 +98,7 @@ class GoogleAIAgent:
                 },
                 "marketing_insights": {
                     "generated_at": datetime.now().isoformat(),
-                    "model": "gemini-pro",
+                    "model": "gemini-2.0-flash",
                     "platform": platform
                 },
                 "metadata": {
@@ -150,7 +150,7 @@ class GoogleAIAgent:
             return {
                 "analysis": response.text,
                 "timestamp": datetime.now().isoformat(),
-                "model": "gemini-pro"
+                "model": "gemini-2.0-flash"
             }
             
         except Exception as e:

@@ -122,8 +122,8 @@ async def create_product_and_auto_post_native(
         platforms_list = ["facebook", "instagram"]  # fallback
     
     # Use enhanced Google AI Agent for caption generation (only if no caption provided)
-    if caption:
-        # Use the provided caption from frontend
+    if caption and caption.strip():
+        # Use the provided caption from frontend preview
         ai_caption = caption
         platform_content = {
             "instagram": caption,
@@ -137,7 +137,10 @@ async def create_product_and_auto_post_native(
         hashtag_matches = re.findall(r'#\w+', caption)
         hashtags = [tag.replace('#', '') for tag in hashtag_matches]
         
+        print(f"✅ Using frontend-provided caption: {caption[:50]}...")
+        
     else:
+        print("🤖 No caption provided from frontend, generating new one...")
         # Generate new caption using AI
         ai_agent = get_ai_agent()
         

@@ -1,4 +1,4 @@
-from InstagramAPI import InstagramAPI
+from instagrapi import Client
 from typing import Optional, Dict, Any
 from app.core.config import settings
 import os
@@ -8,34 +8,37 @@ logger = logging.getLogger(__name__)
 
 
 class InstagramService:
-    """Service for posting to Instagram using InstagramAPI"""
+    """Service for posting to Instagram using instagrapi (latest)"""
     
     def __init__(self):
-        self.api = None
+        self.client = None
         self.is_logged_in = False
         
-        # Initialize Instagram API if credentials are provided
+        # Initialize Instagram client if credentials are provided
         if settings.instagram_username and settings.instagram_password:
             try:
-                self.api = InstagramAPI(
-                    settings.instagram_username, 
-                    settings.instagram_password
-                )
-                logger.info(f"🔧 Instagram API initialized for user: {settings.instagram_username}")
+                self.client = Client()
+                logger.info(f"🔧 Instagram client initialized for user: {settings.instagram_username}")
             except Exception as e:
-                logger.error(f"❌ Failed to initialize Instagram API: {e}")
-                self.api = None
+                logger.error(f"❌ Failed to initialize Instagram client: {e}")
+                self.client = None
         else:
             logger.warning("⚠️ Instagram credentials not provided in settings")
     
     def login(self) -> bool:
         """Login to Instagram"""
-        if not self.api:
-            logger.error("❌ Instagram API not initialized")
+        if not self.client:
+            logger.error("❌ Instagram client not initialized")
             return False
         
         try:
-            login_result = self.api.login()
+            logger.info(f"🔐 Attempting Instagram login for: {settings.instagram_username}")
+            
+            login_result = self.client.login(
+                settings.instagram_username,
+                settings.instagram_password
+            )
+            
             if login_result:
                 self.is_logged_in = True
                 logger.info("✅ Instagram login successful")
@@ -49,9 +52,9 @@ class InstagramService:
     
     def logout(self):
         """Logout from Instagram"""
-        if self.api and self.is_logged_in:
+        if self.client and self.is_logged_in:
             try:
-                self.api.logout()
+                self.client.logout()
                 self.is_logged_in = False
                 logger.info("📤 Instagram logout successful")
             except Exception as e:
@@ -65,7 +68,7 @@ class InstagramService:
         price: float = None
     ) -> Dict[str, Any]:
         """
-        Post a photo to Instagram
+        Post a photo to Instagram using instagrapi
         
         Args:
             image_path: Path to the image file
@@ -77,10 +80,10 @@ class InstagramService:
             Dict with success status and post details
         """
         
-        if not self.api:
+        if not self.client:
             return {
                 "success": False,
-                "error": "Instagram API not initialized - check credentials",
+                "error": "Instagram client not initialized - check credentials",
                 "post_id": None
             }
         
@@ -103,42 +106,30 @@ class InstagramService:
         
         try:
             logger.info(f"📸 Posting to Instagram: {product_name} - {image_path}")
+            logger.info(f"📝 Caption: {caption[:100]}...")
             
-            # Upload photo with caption
-            result = self.api.uploadPhoto(image_path, caption=caption)
+            # Upload photo with caption using instagrapi
+            media = self.client.photo_upload(
+                path=image_path,
+                caption=caption
+            )
             
-            if result:
+            if media:
                 logger.info("✅ Photo posted to Instagram successfully!")
-                
-                # Try to get the post ID (this might not always be available)
-                post_id = None
-                try:
-                    # The InstagramAPI might store the last media ID
-                    if hasattr(self.api, 'LastJson') and self.api.LastJson:
-                        post_id = self.api.LastJson.get('media', {}).get('id', None)
-                except:
-                    pass
                 
                 return {
                     "success": True,
                     "message": "Photo posted successfully to Instagram",
-                    "post_id": post_id,
-                    "username": settings.instagram_username
+                    "post_id": str(media.pk),
+                    "media_id": str(media.id), 
+                    "username": settings.instagram_username,
+                    "media_url": media.thumbnail_url if hasattr(media, 'thumbnail_url') else None
                 }
             else:
                 logger.error("❌ Failed to upload photo to Instagram")
-                error_msg = "Upload failed"
-                
-                # Try to get error details
-                try:
-                    if hasattr(self.api, 'LastJson') and self.api.LastJson:
-                        error_msg = self.api.LastJson.get('message', 'Upload failed')
-                except:
-                    pass
-                
                 return {
                     "success": False,
-                    "error": error_msg,
+                    "error": "Upload failed - media object is None",
                     "post_id": None
                 }
                 
@@ -149,6 +140,45 @@ class InstagramService:
                 "error": f"Instagram posting error: {str(e)}",
                 "post_id": None
             }
+    
+    def get_user_info(self, username: str = None) -> Dict[str, Any]:
+        """Get user information"""
+        if not self.client or not self.is_logged_in:
+            return {"error": "Client not logged in"}
+        
+        try:
+            target_username = username or settings.instagram_username
+            user_info = self.client.user_info_by_username(target_username)
+            return user_info.dict() if hasattr(user_info, 'dict') else user_info
+        except Exception as e:
+            logger.error(f"Error getting user info: {e}")
+            return {"error": str(e)}
+    
+    def get_recent_posts(self, count: int = 10) -> list:
+        """Get recent posts from the account"""
+        if not self.client or not self.is_logged_in:
+            return []
+        
+        try:
+            user_id = self.client.user_id_from_username(settings.instagram_username)
+            medias = self.client.user_medias(user_id, amount=count)
+            
+            posts = []
+            for media in medias:
+                post_data = {
+                    "id": str(media.pk),
+                    "caption": media.caption_text,
+                    "like_count": media.like_count,
+                    "comment_count": media.comment_count,
+                    "media_type": media.media_type,
+                    "taken_at": media.taken_at,
+                }
+                posts.append(post_data)
+            
+            return posts
+        except Exception as e:
+            logger.error(f"Error getting recent posts: {e}")
+            return []
         finally:
             # Logout after posting (optional - you might want to keep the session)
             # self.logout()

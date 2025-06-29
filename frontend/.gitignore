@@ -43,3 +43,32 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Configuration files with sensitive data
+# Backend config files
+../craftsmen-marketplace-backend/.env
+../craftsmen-marketplace-backend/.env.local
+../craftsmen-marketplace-backend/.env.production
+../craftsmen-marketplace-backend/config.py
+../craftsmen-marketplace-backend/credentials/
+../craftsmen-marketplace-backend/app/core/config.py
+
+# API Keys and secrets
+**/api_keys.json
+**/credentials.json
+**/.env
+**/.env.local
+**/.env.production
+
+# Database files
+**/*.db
+**/*.sqlite
+**/*.sqlite3
+
+# Instagram bot files
+**/config/
+**/sessions/
+
+# Log files
+**/*.log
+**/logs/

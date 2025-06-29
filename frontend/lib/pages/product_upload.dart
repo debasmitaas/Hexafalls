@@ -86,12 +86,12 @@ class _ProductUploadPageState extends State<ProductUploadPage> {
   
   // Backend URL configurations
   // Use this to connect to your backend
-  static const String backendUrl = 'http://192.168.1.100:8000'; // CHANGE THIS to your computer's IP address
+  static const String backendUrl = 'http://192.168.133.28:8000'; // CHANGE THIS to your computer's IP address
   
   // You can use different URLs for different environments:
   // - Android Emulator: 'http://10.0.2.2:8000'
   // - iOS Simulator: 'http://localhost:8000'
-  // - Physical Device: Use your computer's IP address, like '192.168.1.100:8000'
+  // - Physical Device: Use your computer's IP address, like '192.168.133.28:8000'
 
   @override
   void initState() {

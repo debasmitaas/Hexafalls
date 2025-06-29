@@ -83,7 +83,7 @@ String getBackendUrl() {
     return 'http://localhost:8000';
   } else {
     // Physical device or other platforms
-    return 'http://192.168.1.100:8000';
+    return 'http://192.168.133.28:8000';
   }
 }
 ```

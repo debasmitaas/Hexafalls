@@ -341,16 +341,21 @@ class _ProductUploadPageState extends State<ProductUploadPage> {
 
   @override
   Widget build(BuildContext context) {
-    final Color mainPurple = const Color(0xFF6C4DD3);
-    final Color lightPurple = const Color(0xFFB9A7F8);
-    final Color darkPurple = const Color(0xFF4B2FAE);
-    final Color bgPurple = const Color(0xFFEEE9FB);
+    // Use warm earthy colors as in intro_page.dart
+    const Color terracotta = Color(0xFFE2725B);
+    const Color mustard = Color(0xFFF6C244);
+    const Color mutedBrown = Color(0xFF8D6748);
+    const Color background = Color(0xFFFFF8F2);
+    const Color lightCard = Colors.white;
     return Scaffold(
-      backgroundColor: bgPurple,
+      backgroundColor: background,
       appBar: AppBar(
-        backgroundColor: mainPurple,
+        backgroundColor: terracotta,
         elevation: 0,
-        title: Text(_t('appTitle'), style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
+        title: Text(
+          _isBengali ? 'শিল্পস্ফিয়ার' : 'ShilpoSphere',
+          style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+        ),
         actions: [
           TextButton(
             onPressed: () {
@@ -359,7 +364,7 @@ class _ProductUploadPageState extends State<ProductUploadPage> {
               });
             },
             child: Text(
-              _t('toggleLanguage'),
+              _isBengali ? 'English' : 'বাংলা',
               style: const TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 16,
@@ -378,7 +383,7 @@ class _ProductUploadPageState extends State<ProductUploadPage> {
             child: Container(
               height: 120,
               decoration: BoxDecoration(
-                color: mainPurple,
+                color: terracotta,
                 borderRadius: const BorderRadius.only(
                   bottomLeft: Radius.circular(32),
                   bottomRight: Radius.circular(32),
@@ -395,18 +400,18 @@ class _ProductUploadPageState extends State<ProductUploadPage> {
                 Card(
                   elevation: 8,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-                  color: Colors.white,
+                  color: lightCard,
                   child: Padding(
                     padding: const EdgeInsets.all(16.0),
                     child: Column(
                       children: [
                         Row(
                           children: [
-                            Icon(Icons.image, color: mainPurple, size: 28),
+                            Icon(Icons.image, color: terracotta, size: 28),
                             const SizedBox(width: 8),
                             Text(
-                              _t('productImage'),
-                              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: mainPurple),
+                              _isBengali ? 'পণ্যের ছবি' : 'Product Image',
+                              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: terracotta),
                             ),
                           ],
                         ),
@@ -428,28 +433,28 @@ class _ProductUploadPageState extends State<ProductUploadPage> {
                                   height: 180,
                                   width: double.infinity,
                                   decoration: BoxDecoration(
-                                    border: Border.all(color: lightPurple, width: 2),
+                                    border: Border.all(color: mustard, width: 2),
                                     borderRadius: BorderRadius.circular(16),
-                                    color: bgPurple,
+                                    color: background,
                                   ),
                                   child: const Icon(
                                     Icons.add_photo_alternate,
                                     size: 60,
-                                    color: Color(0xFFB9A7F8),
+                                    color: Color(0xFFF6C244),
                                   ),
                                 ),
                         ),
                         const SizedBox(height: 16),
                         ElevatedButton.icon(
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: mainPurple,
+                            backgroundColor: terracotta,
                             foregroundColor: Colors.white,
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                             elevation: 4,
                           ),
                           onPressed: _pickImage,
                           icon: const Icon(Icons.photo_camera),
-                          label: Text(_t('selectImage'), style: const TextStyle(fontWeight: FontWeight.bold)),
+                          label: Text(_isBengali ? 'ছবি নির্বাচন করুন' : 'Select Image', style: const TextStyle(fontWeight: FontWeight.bold)),
                         ),
                       ],
                     ),
@@ -460,7 +465,7 @@ class _ProductUploadPageState extends State<ProductUploadPage> {
                 Card(
                   elevation: 6,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                  color: Colors.white,
+                  color: lightCard,
                   child: Padding(
                     padding: const EdgeInsets.all(16.0),
                     child: Column(
@@ -468,11 +473,11 @@ class _ProductUploadPageState extends State<ProductUploadPage> {
                       children: [
                         Row(
                           children: [
-                            Icon(Icons.label, color: mainPurple, size: 24),
+                            Icon(Icons.label, color: terracotta, size: 24),
                             const SizedBox(width: 8),
                             Text(
-                              _t('productName'),
-                              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: mainPurple),
+                              _isBengali ? 'পণ্যের নাম' : 'Product Name',
+                              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: terracotta),
                             ),
                           ],
                         ),
@@ -483,7 +488,7 @@ class _ProductUploadPageState extends State<ProductUploadPage> {
                               child: TextField(
                                 controller: _productNameController,
                                 decoration: InputDecoration(
-                                  hintText: _t('productNameHint'),
+                                  hintText: _isBengali ? 'পণ্যের নাম লিখুন অথবা ভয়েস ব্যবহার করুন' : 'Enter product name or use speech',
                                   border: const OutlineInputBorder(),
                                 ),
                               ),
@@ -498,7 +503,7 @@ class _ProductUploadPageState extends State<ProductUploadPage> {
                                   : null,
                                 icon: Icon(
                                   _isListening && _currentField == 'name' ? Icons.mic_off : Icons.mic,
-                                  color: _isListening && _currentField == 'name' ? Colors.red : mainPurple,
+                                  color: _isListening && _currentField == 'name' ? Colors.red : terracotta,
                                 ),
                               ),
                             ),
@@ -521,7 +526,7 @@ class _ProductUploadPageState extends State<ProductUploadPage> {
                 Card(
                   elevation: 6,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                  color: Colors.white,
+                  color: lightCard,
                   child: Padding(
                     padding: const EdgeInsets.all(16.0),
                     child: Column(
@@ -529,11 +534,11 @@ class _ProductUploadPageState extends State<ProductUploadPage> {
                       children: [
                         Row(
                           children: [
-                            Icon(Icons.attach_money, color: mainPurple, size: 24),
+                            Icon(Icons.attach_money, color: terracotta, size: 24),
                             const SizedBox(width: 8),
                             const Text(
                               'Price (₹)',
-                              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF6C4DD3)),
+                              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFFE2725B)),
                             ),
                           ],
                         ),
@@ -561,7 +566,7 @@ class _ProductUploadPageState extends State<ProductUploadPage> {
                                   : null,
                                 icon: Icon(
                                   _isListening && _currentField == 'price' ? Icons.mic_off : Icons.mic,
-                                  color: _isListening && _currentField == 'price' ? Colors.red : mainPurple,
+                                  color: _isListening && _currentField == 'price' ? Colors.red : terracotta,
                                 ),
                               ),
                             ),
@@ -603,21 +608,20 @@ class _ProductUploadPageState extends State<ProductUploadPage> {
                                 _showSnackBar('Please enter a price');
                                 return;
                               }
-                              
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
                                     builder: (context) => PreviewPage(
-                                      imagePath: _selectedImage!.path,
-                                      productName: _productNameController.text,
-                                      price: _priceController.text,
-                                    )),
+                                          imagePath: _selectedImage!.path,
+                                          productName: _productNameController.text,
+                                          price: _priceController.text,
+                                        )),
                               );
                             },
                       icon: const Icon(Icons.remove_red_eye),
                       label: const Text('Generate & Preview'),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: darkPurple,
+                        backgroundColor: terracotta,
                         foregroundColor: Colors.white,
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                         elevation: 6,
@@ -634,16 +638,16 @@ class _ProductUploadPageState extends State<ProductUploadPage> {
                     height: 50,
                     child: ElevatedButton.icon(
                       onPressed: _isLoading ? null : _createAndPostProduct,
-                      icon: _isLoading 
-                        ? const SizedBox(
-                            width: 20,
-                            height: 20,
-                            child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
-                          )
-                        : const Icon(Icons.share),
-                      label: Text(_isLoading ? _t('posting') : 'Post'),
+                      icon: _isLoading
+                          ? const SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                            )
+                          : const Icon(Icons.share),
+                      label: Text(_isLoading ? 'Posting...' : 'Post'),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: mainPurple,
+                        backgroundColor: mustard,
                         foregroundColor: Colors.white,
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                         elevation: 6,
@@ -651,90 +655,6 @@ class _ProductUploadPageState extends State<ProductUploadPage> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 18),
-                // Instructions
-                // Card(
-                //   elevation: 2,
-                //   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                //   color: Colors.white,
-                //   child: Padding(
-                //     padding: const EdgeInsets.all(16.0),
-                //     child: Column(
-                //       crossAxisAlignment: CrossAxisAlignment.start,
-                //       children: [
-                //         Row(
-                //           children: [
-                //             Icon(Icons.info_outline, color: mainPurple),
-                //             const SizedBox(width: 8),
-                //             Text(
-                //               _t('instructions'),
-                //               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: mainPurple),
-                //             ),
-                //           ],
-                //         ),
-                //         const SizedBox(height: 8),
-                //         Text(_t('step1'), style: const TextStyle(fontSize: 14)),
-                //         Text(_t('step2'), style: const TextStyle(fontSize: 14)),
-                //         Text(_t('step3'), style: const TextStyle(fontSize: 14)),
-                //         Text(_t('step4'), style: const TextStyle(fontSize: 14)),
-                //         const SizedBox(height: 8),
-                //         Text(
-                //           _t('serverNote'),
-                //           style: const TextStyle(fontStyle: FontStyle.italic, color: Colors.grey),
-                //         ),
-                //       ],
-                //     ),
-                //   ),
-                // ),
-                // const SizedBox(height: 10),
-                // // Debug Info
-                // Card(
-                //   elevation: 1,
-                //   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                //   color: Colors.white,
-                //   child: Padding(
-                //     padding: const EdgeInsets.all(16.0),
-                //     child: Column(
-                //       crossAxisAlignment: CrossAxisAlignment.start,
-                //       children: [
-                //         Row(
-                //           children: [
-                //             Icon(Icons.bug_report, color: mainPurple),
-                //             const SizedBox(width: 8),
-                //             Text(
-                //               _t('debugInfo'),
-                //               style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: mainPurple),
-                //             ),
-                //           ],
-                //         ),
-                //         const SizedBox(height: 4),
-                //         Text('${_t('speechAvailable')}: ${_speechEnabled ? "Yes" : "No"}', 
-                //              style: const TextStyle(fontSize: 12)),
-                //         Text('${_t('listening')}: ${_isListening ? "Yes" : "No"}', 
-                //              style: const TextStyle(fontSize: 12)),
-                //         Text('${_t('status')}: $_speechStatus', 
-                //              style: const TextStyle(fontSize: 12)),
-                //         const SizedBox(height: 8),
-                //         ElevatedButton(
-                //           style: ElevatedButton.styleFrom(
-                //             backgroundColor: mainPurple,
-                //             foregroundColor: Colors.white,
-                //             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                //           ),
-                //           onPressed: () async {
-                //             var status = await Permission.microphone.status;
-                //             _showSnackBar('Microphone permission: \\${status.toString()}');
-                //             if (!status.isGranted) {
-                //               status = await Permission.microphone.request();
-                //               _showSnackBar('After request: \\${status.toString()}');
-                //             }
-                //           },
-                //           child: Text(_t('testMic'), style: const TextStyle(fontWeight: FontWeight.bold)),
-                //         ),
-                //       ],
-                //     ),
-                //   ),
-                // ),
                 const SizedBox(height: 24),
               ],
             ),

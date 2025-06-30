@@ -7,7 +7,7 @@ import json
 
 from app.core.config import settings
 from app.services.ai_service import AIService
-from app.services.instagram_service_new import InstagramService
+from app.services.instagram_service import instagram_service
 from app.schemas.schemas import SocialMediaPostResponse
 
 
@@ -21,7 +21,18 @@ class SocialMediaAutomationService:
             self.facebook_api = facebook.GraphAPI(access_token=settings.facebook_access_token)
         
         # Initialize Instagram Service with username/password
-        self.instagram_service = InstagramService()
+        self.instagram_service = instagram_service
+        
+        # Auto-login to Instagram and keep session active
+        if self.instagram_service.client:
+            try:
+                login_success = self.instagram_service.login()
+                if login_success:
+                    print("✅ Instagram auto-login successful - ready for posting!")
+                else:
+                    print("⚠️ Instagram auto-login failed")
+            except Exception as e:
+                print(f"⚠️ Instagram auto-login error: {e}")
         
         # Keep instagrapi as backup (if needed)
         self.instagram_client = None
@@ -172,13 +183,17 @@ class SocialMediaAutomationService:
             return None
     
     async def _post_to_instagram(self, image_path: str, caption: str) -> Optional[str]:
-        """Post to Instagram Business Account"""
+        """Post to Instagram using the new service"""
         try:
-            media = self.instagram_client.photo_upload(
-                path=image_path,
+            result = await self.instagram_service.post_photo(
+                image_path=image_path,
                 caption=caption
             )
-            return str(media.pk)
+            if result["success"]:
+                return result["post_id"]
+            else:
+                print(f"Instagram posting error: {result['error']}")
+                return None
         except Exception as e:
             print(f"Instagram posting error: {str(e)}")
             return None
@@ -205,7 +220,7 @@ class SocialMediaAutomationService:
             responses["facebook"] = fb_responses
         
         # Monitor Instagram comments
-        if "instagram" in post_ids and self.instagram_client:
+        if "instagram" in post_ids and self.instagram_service.client:
             ig_responses = await self._monitor_instagram_comments(post_ids["instagram"])
             responses["instagram"] = ig_responses
         
@@ -506,20 +521,23 @@ class SocialMediaAutomationService:
     async def post_to_instagram(self, caption: str, image_path: str) -> Dict[str, Any]:
         """Post to Instagram with enhanced result format"""
         try:
-            if not self.instagram_client:
-                return {"success": False, "message": "Instagram API not configured", "post_id": None}
-            
-            media = self.instagram_client.photo_upload(
-                path=image_path,
+            result = await self.instagram_service.post_photo(
+                image_path=image_path,
                 caption=caption
             )
             
-            post_id = str(media.pk)
-            return {
-                "success": True,
-                "post_id": post_id,
-                "message": "Posted successfully to Instagram"
-            }
+            if result["success"]:
+                return {
+                    "success": True,
+                    "post_id": result["post_id"],
+                    "message": "Posted successfully to Instagram"
+                }
+            else:
+                return {
+                    "success": False,
+                    "post_id": None,
+                    "message": f"Instagram posting error: {result['error']}"
+                }
         except Exception as e:
             return {
                 "success": False,

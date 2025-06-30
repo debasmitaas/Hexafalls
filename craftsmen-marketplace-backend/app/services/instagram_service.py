@@ -186,13 +186,13 @@ class InstagramService:
     
     def test_connection(self) -> Dict[str, Any]:
         """Test Instagram connection"""
-        if not self.api:
+        if not self.client:
             return {
                 "connected": False,
-                "error": "Instagram API not initialized",
+                "error": "Instagram client not initialized",
                 "username": None
             }
-        
+
         if not self.is_logged_in:
             login_success = self.login()
             if not login_success:
@@ -201,7 +201,7 @@ class InstagramService:
                     "error": "Failed to login",
                     "username": settings.instagram_username
                 }
-        
+
         return {
             "connected": True,
             "message": "Instagram connection successful",

@@ -26,36 +26,52 @@ class InstagramService:
             logger.warning("⚠️ Instagram credentials not provided in settings")
     
     def login(self) -> bool:
-        """Login to Instagram"""
+        """Login to Instagram with persistent session"""
         if not self.bot:
             logger.error("❌ Instagram bot not initialized")
             return False
-        
+
+        # If already logged in, just return True
+        if self.is_logged_in:
+            logger.info("✅ Already logged in to Instagram")
+            return True
+
         try:
+            # Try to login with stored session first
             login_result = self.bot.login(
                 username=settings.instagram_username,
-                password=settings.instagram_password
+                password=settings.instagram_password,
+                use_cookie=True  # Use saved session if available
             )
             if login_result:
                 self.is_logged_in = True
-                logger.info("✅ Instagram login successful")
+                logger.info("✅ Instagram login successful - session will stay active")
                 return True
             else:
                 logger.error("❌ Instagram login failed")
                 return False
         except Exception as e:
             logger.error(f"❌ Instagram login error: {e}")
+            # If login fails, try without cookie
+            try:
+                login_result = self.bot.login(
+                    username=settings.instagram_username,
+                    password=settings.instagram_password,
+                    use_cookie=False
+                )
+                if login_result:
+                    self.is_logged_in = True
+                    logger.info("✅ Instagram login successful (retry) - session will stay active")
+                    return True
+            except Exception as retry_error:
+                logger.error(f"❌ Instagram login retry failed: {retry_error}")
             return False
     
     def logout(self):
-        """Logout from Instagram"""
-        if self.bot and self.is_logged_in:
-            try:
-                self.bot.logout()
-                self.is_logged_in = False
-                logger.info("📤 Instagram logout successful")
-            except Exception as e:
-                logger.error(f"❌ Instagram logout error: {e}")
+        """Logout from Instagram - DISABLED to keep session active"""
+        # Keep the session active for automatic posting
+        logger.info("� Keeping Instagram session active for automatic posting")
+        pass  # Don't actually logout
     
     async def post_photo(
         self, 

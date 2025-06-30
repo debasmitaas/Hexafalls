@@ -74,9 +74,8 @@ async def upload_product_image(
 
 @router.post("/create-and-post-native", response_model=Dict[str, Any])
 async def create_product_and_auto_post_native(
-    image_file: UploadFile = File(...),
-    product_name: str = Form(..., alias="product_name"),  # Accept both name and product_name
-    name: Optional[str] = Form(None),  # For backward compatibility
+    file: UploadFile = File(...),  # Changed from image_file to file to match frontend
+    product_name: str = Form(...),
     price: float = Form(...),
     description: Optional[str] = Form(None),
     category: Optional[str] = Form(None),
@@ -90,13 +89,13 @@ async def create_product_and_auto_post_native(
     generate AI caption with Google ADK, and auto-post to social media
     """
     
-    # Handle name field (support both 'name' and 'product_name')
-    product_name_value = product_name or name
+    # Handle product name
+    product_name_value = product_name
     if not product_name_value:
         raise HTTPException(status_code=400, detail="Product name is required")
     
     # Upload image first
-    image_upload = await upload_product_image(file=image_file, db=db)
+    image_upload = await upload_product_image(file=file, db=db)
     
     # Create product in database
     db_product = Product(

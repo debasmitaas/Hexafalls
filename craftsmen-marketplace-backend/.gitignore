@@ -14,8 +14,6 @@ wheels/
 # Configuration files with sensitive data
 .env.local
 .env.production
-config.py
-app/core/config.py
 
 # API Keys and credentials
 credentials/

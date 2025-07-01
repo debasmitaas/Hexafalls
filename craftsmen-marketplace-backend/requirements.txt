@@ -8,4 +8,5 @@ facebook-sdk
 httpx
 python-dotenv
 mangum
-pydantic_settings
+pydantic-settings
+Pillow

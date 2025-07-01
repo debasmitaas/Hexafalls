@@ -1,11 +1,43 @@
-from fastapi import FastAPI, Depends
-from fastapi.staticfiles import StaticFiles
-from fastapi.middleware.cors import CORSMiddleware
+import sys
 import os
+from pathlib import Path
 
-from app.core.config import settings
-from app.core.database import engine, Base
-from app.api import products, orders, speech, automation, native_products, native_speech, ai, native_products_compat
+# Add the project root to Python path for proper module resolution
+project_root = Path(__file__).parent
+sys.path.insert(0, str(project_root))
+sys.path.insert(0, str(project_root / "app"))
+
+# Print debug info for cloud deployment troubleshooting
+print(f"Python path: {sys.path[:3]}")
+print(f"Project root: {project_root}")
+print(f"Current working directory: {os.getcwd()}")
+
+try:
+    from fastapi import FastAPI, Depends
+    from fastapi.staticfiles import StaticFiles
+    from fastapi.middleware.cors import CORSMiddleware
+    print("✓ FastAPI imports successful")
+except ImportError as e:
+    print(f"✗ FastAPI import error: {e}")
+    raise
+
+try:
+    from app.core.config import settings
+    from app.core.database import engine, Base
+    print("✓ Core module imports successful")
+except ImportError as e:
+    print(f"✗ Core module import error: {e}")
+    print(f"Available files in app/core: {list((project_root / 'app' / 'core').glob('*.py'))}")
+    raise
+
+try:
+    from app.api import products, orders, speech, automation, native_products, native_speech, ai, native_products_compat
+    print("✓ API module imports successful")
+    api_modules_loaded = True
+except ImportError as e:
+    print(f"✗ API module import error: {e}")
+    # Set flag to skip router inclusion
+    api_modules_loaded = False
 
 # Create database tables
 Base.metadata.create_all(bind=engine)
@@ -26,15 +58,18 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Include API routers
-app.include_router(products.router, prefix="/api")
-app.include_router(orders.router, prefix="/api")
-app.include_router(speech.router, prefix="/api")
-app.include_router(automation.router, prefix="/api")
-app.include_router(native_products.router, prefix="/api")
-app.include_router(native_speech.router, prefix="/api")
-app.include_router(ai.router, prefix="/ai", tags=["AI"])
-app.include_router(native_products_compat.router)  # Direct path for frontend compatibility
+# Include API routers only if modules loaded successfully
+if api_modules_loaded:
+    app.include_router(products.router, prefix="/api")
+    app.include_router(orders.router, prefix="/api")
+    app.include_router(speech.router, prefix="/api")
+    app.include_router(automation.router, prefix="/api")
+    app.include_router(native_products.router, prefix="/api")
+    app.include_router(native_speech.router, prefix="/api")
+    app.include_router(ai.router, prefix="/ai", tags=["AI"])
+    app.include_router(native_products_compat.router)  # Direct path for frontend compatibility
+else:
+    print("⚠️ Skipping API router inclusion due to import errors")
 
 # Create uploads directory
 os.makedirs(settings.upload_folder, exist_ok=True)

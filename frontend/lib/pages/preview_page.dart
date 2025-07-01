@@ -21,7 +21,7 @@ class _PreviewPageState extends State<PreviewPage> {
   bool isPosting = false;
   
   // Backend URL - same as in product_upload.dart
-  static const String backendUrl = 'http://192.168.133.28:8000';
+  static const String backendUrl = 'https://shilpospherebackend-production.up.railway.app/';
 
   @override
   void initState() {
@@ -219,16 +219,13 @@ class _PreviewPageState extends State<PreviewPage> {
 
   @override
   Widget build(BuildContext context) {
-    // Use warm earthy colors as in intro_page.dart
-    const Color terracotta = Color(0xFFE2725B);
-    const Color mustard = Color(0xFFF6C244);
-    const Color mutedBrown = Color(0xFF8D6748);
-    const Color background = Color(0xFFFFF8F2);
+    final Color mainPurple = const Color(0xFF6C4DD3);
+    final Color bgPurple = const Color(0xFFEEE9FB);
     
     return Scaffold(
-      backgroundColor: background,
+      backgroundColor: bgPurple,
       appBar: AppBar(
-        backgroundColor: terracotta,
+        backgroundColor: mainPurple,
         elevation: 0,
         title: const Text('Post Preview', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
         leading: IconButton(
@@ -255,7 +252,7 @@ class _PreviewPageState extends State<PreviewPage> {
                     child: Row(
                       children: [
                         CircleAvatar(
-                          backgroundColor: terracotta,
+                          backgroundColor: mainPurple,
                           radius: 20,
                           child: const Icon(Icons.store, color: Colors.white, size: 20),
                         ),
@@ -265,7 +262,7 @@ class _PreviewPageState extends State<PreviewPage> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               const Text(
-                                'ShilpoSphere',
+                                'Craftsmen Marketplace',
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 16,
@@ -274,14 +271,14 @@ class _PreviewPageState extends State<PreviewPage> {
                               Text(
                                 'Just now',
                                 style: TextStyle(
-                                  color: mutedBrown,
+                                  color: Colors.grey[600],
                                   fontSize: 12,
                                 ),
                               ),
                             ],
                           ),
                         ),
-                        Icon(Icons.more_horiz, color: mutedBrown),
+                        Icon(Icons.more_horiz, color: Colors.grey[600]),
                       ],
                     ),
                   ),
@@ -298,7 +295,7 @@ class _PreviewPageState extends State<PreviewPage> {
                                   height: 16,
                                   child: CircularProgressIndicator(
                                     strokeWidth: 2,
-                                    color: terracotta,
+                                    color: mainPurple,
                                   ),
                                 ),
                                 const SizedBox(width: 8),
@@ -320,7 +317,7 @@ class _PreviewPageState extends State<PreviewPage> {
                                       ),
                                     ),
                                     IconButton(
-                                      icon: Icon(Icons.edit, size: 20, color: terracotta),
+                                      icon: Icon(Icons.edit, size: 20, color: mainPurple),
                                       onPressed: () => _editCaption(),
                                       tooltip: 'Edit caption',
                                     ),
@@ -352,9 +349,9 @@ class _PreviewPageState extends State<PreviewPage> {
                     Container(
                       width: double.infinity,
                       decoration: BoxDecoration(
-                        color: mustard.withOpacity(0.10),
+                        color: Colors.white.withOpacity(0.95),
                         border: Border(
-                          top: BorderSide(color: terracotta.withOpacity(0.2)),
+                          top: BorderSide(color: Colors.grey[300]!),
                         ),
                       ),
                       padding: const EdgeInsets.all(16.0),
@@ -364,20 +361,20 @@ class _PreviewPageState extends State<PreviewPage> {
                           if (widget.productName != null)
                             Text(
                               widget.productName!,
-                              style: TextStyle(
+                              style: const TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
-                                color: mutedBrown,
+                                color: Colors.black87,
                               ),
                             ),
                           const SizedBox(height: 4),
                           if (widget.price != null)
                             Text(
-                              '₹ ${widget.price}',
+                              '৳ ${widget.price}',
                               style: TextStyle(
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold,
-                                color: terracotta,
+                                color: mainPurple,
                               ),
                             ),
                         ],
@@ -389,16 +386,16 @@ class _PreviewPageState extends State<PreviewPage> {
                     padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
                     decoration: BoxDecoration(
                       border: Border(
-                        top: BorderSide(color: terracotta.withOpacity(0.15)),
+                        top: BorderSide(color: Colors.grey[300]!),
                       ),
                     ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
-                        _buildEngagementButton(Icons.thumb_up, 'Like', terracotta),
-                        _buildEngagementButton(Icons.comment, 'Comment', mutedBrown),
-                        _buildEngagementButton(Icons.share, 'Share', mutedBrown),
-                        _buildEngagementButton(Icons.message, 'Message', mustard),
+                        _buildEngagementButton(Icons.thumb_up, 'Like', Colors.blue),
+                        _buildEngagementButton(Icons.comment, 'Comment', Colors.grey[600]!),
+                        _buildEngagementButton(Icons.share, 'Share', Colors.grey[600]!),
+                        _buildEngagementButton(Icons.message, 'Message', Colors.green),
                       ],
                     ),
                   ),
@@ -417,7 +414,7 @@ class _PreviewPageState extends State<PreviewPage> {
                     icon: const Icon(Icons.edit),
                     label: const Text('Edit Post'),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: mutedBrown,
+                      backgroundColor: Colors.grey[600],
                       foregroundColor: Colors.white,
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                       padding: const EdgeInsets.symmetric(vertical: 14),
@@ -440,7 +437,7 @@ class _PreviewPageState extends State<PreviewPage> {
                         : const Icon(Icons.publish),
                     label: Text(isPosting ? 'Posting...' : 'Post Now'),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: terracotta,
+                      backgroundColor: mainPurple,
                       foregroundColor: Colors.white,
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                       padding: const EdgeInsets.symmetric(vertical: 14),
@@ -456,18 +453,18 @@ class _PreviewPageState extends State<PreviewPage> {
             Card(
               elevation: 2,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-              color: mustard.withOpacity(0.15),
+              color: Colors.blue[50],
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: Row(
                   children: [
-                    Icon(Icons.info_outline, color: terracotta, size: 20),
+                    Icon(Icons.info_outline, color: Colors.blue[700], size: 20),
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
                         'This is how your post will appear on Facebook and Instagram',
                         style: TextStyle(
-                          color: terracotta,
+                          color: Colors.blue[700],
                           fontSize: 13,
                         ),
                       ),

@@ -8,3 +8,4 @@ facebook-sdk
 httpx
 python-dotenv
 mangum
+pydantic_settings

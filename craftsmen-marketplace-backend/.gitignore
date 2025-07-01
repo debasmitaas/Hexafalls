@@ -63,3 +63,4 @@ Thumbs.db
 uploads/
 static/uploads/
 test_debugging_files/
+.vercel

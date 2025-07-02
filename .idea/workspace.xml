@@ -4,11 +4,7 @@
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="83bfd91e-6c76-4bb0-b733-3e85439df2b4" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/lib/pages/intro_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/lib/pages/intro_page.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/lib/pages/preview_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/lib/pages/preview_page.dart" afterDir="false" />
-    </list>
+    <list default="true" id="83bfd91e-6c76-4bb0-b733-3e85439df2b4" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -39,7 +35,7 @@
     "cf.first.check.clang-format": "false",
     "cidr.known.project.marker": "true",
     "dart.analysis.tool.window.visible": "false",
-    "git-widget-placeholder": "sutapa",
+    "git-widget-placeholder": "main",
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "/home/sutapa/Hackathones/hexa2/Hexafalls",
     "show.migrate.to.gradle.popup": "false"
